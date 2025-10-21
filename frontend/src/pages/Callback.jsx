@@ -9,9 +9,14 @@ const Callback = () => {
   const { login } = useAuth();
   const [status, setStatus] = useState('loading'); // loading, success, error
   const [error, setError] = useState('');
+  const [hasProcessed, setHasProcessed] = useState(false);
 
   useEffect(() => {
+    // Prevent multiple API calls
+    if (hasProcessed) return;
+    
     const handleCallback = async () => {
+      setHasProcessed(true);
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
