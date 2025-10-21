@@ -1,8 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Play, ExternalLink } from 'lucide-react';
+import { Play, Pause, ExternalLink } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import useSpotifyPlayer from '../hooks/useSpotifyPlayer';
 
 const TrackCard = ({ track, rank }) => {
+  const { accessToken } = useAuth();
+  const { isReady, isPlaying, currentTrack, playTrack, togglePlayback } = useSpotifyPlayer(accessToken);
+  
   const formatDuration = (ms) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -10,10 +15,22 @@ const TrackCard = ({ track, rank }) => {
   };
 
   const handlePlay = () => {
-    if (track.external_urls?.spotify) {
+    if (isReady && track.uri) {
+      // If this track is currently playing, toggle playback
+      if (currentTrack?.id === track.id) {
+        togglePlayback();
+      } else {
+        // Play this track
+        playTrack(track.uri);
+      }
+    } else if (track.external_urls?.spotify) {
+      // Fallback to opening in Spotify
       window.open(track.external_urls.spotify, '_blank');
     }
   };
+
+  const isCurrentTrack = currentTrack?.id === track.id;
+  const isTrackPlaying = isCurrentTrack && isPlaying;
 
   return (
     <motion.div
@@ -21,7 +38,11 @@ const TrackCard = ({ track, rank }) => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
       whileHover={{ scale: 1.02 }}
-      className="flex items-center space-x-4 p-4 bg-spotify-gray rounded-lg hover:bg-gray-700 transition-colors group"
+      className={`flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 rounded-lg transition-colors group ${
+        isCurrentTrack 
+          ? 'bg-spotify-green/20 border border-spotify-green/30' 
+          : 'bg-spotify-gray hover:bg-gray-700'
+      }`}
     >
       {/* Rank */}
       <div className="flex-shrink-0 w-8 text-center">
@@ -29,20 +50,27 @@ const TrackCard = ({ track, rank }) => {
       </div>
 
       {/* Album Art */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 relative">
         <img
           src={track.album?.images?.[0]?.url || '/placeholder-album.png'}
           alt={track.album?.name}
-          className="w-12 h-12 rounded object-cover"
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded object-cover"
         />
+        {isCurrentTrack && (
+          <div className="absolute inset-0 bg-spotify-green/20 rounded flex items-center justify-center">
+            <div className="w-2 h-2 bg-spotify-green rounded-full animate-pulse"></div>
+          </div>
+        )}
       </div>
 
       {/* Track Info */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-white font-medium truncate group-hover:text-spotify-green transition-colors">
+        <h3 className={`font-medium truncate transition-colors text-sm sm:text-base ${
+          isCurrentTrack ? 'text-spotify-green' : 'text-white group-hover:text-spotify-green'
+        }`}>
           {track.name}
         </h3>
-        <p className="text-spotify-lightGray text-sm truncate">
+        <p className="text-spotify-lightGray text-xs sm:text-sm truncate">
           {track.artists?.map(artist => artist.name).join(', ')}
         </p>
         <p className="text-spotify-lightGray text-xs truncate">
@@ -51,7 +79,7 @@ const TrackCard = ({ track, rank }) => {
       </div>
 
       {/* Duration */}
-      <div className="flex-shrink-0 text-spotify-lightGray text-sm">
+      <div className="flex-shrink-0 text-spotify-lightGray text-xs sm:text-sm hidden sm:block">
         {formatDuration(track.duration_ms)}
       </div>
 
@@ -61,9 +89,14 @@ const TrackCard = ({ track, rank }) => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={handlePlay}
-          className="p-2 text-spotify-lightGray hover:text-spotify-green transition-colors"
+          className={`p-2 transition-colors ${
+            isTrackPlaying 
+              ? 'text-spotify-green' 
+              : 'text-spotify-lightGray hover:text-spotify-green'
+          }`}
+          title={isReady ? (isTrackPlaying ? 'Pause' : 'Play') : 'Open in Spotify'}
         >
-          <Play className="w-4 h-4" />
+          {isTrackPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
         </motion.button>
         {track.external_urls?.spotify && (
           <motion.button
@@ -71,6 +104,7 @@ const TrackCard = ({ track, rank }) => {
             whileTap={{ scale: 0.9 }}
             onClick={() => window.open(track.external_urls.spotify, '_blank')}
             className="p-2 text-spotify-lightGray hover:text-spotify-green transition-colors"
+            title="Open in Spotify"
           >
             <ExternalLink className="w-4 h-4" />
           </motion.button>

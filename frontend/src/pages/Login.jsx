@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Music, Headphones } from 'lucide-react';
+import Logo from '../components/Logo';
 
 const Login = () => {
   const handleSpotifyLogin = () => {
@@ -10,7 +11,10 @@ const Login = () => {
       'user-read-private',
       'user-read-email',
       'user-top-read',
-      'user-read-recently-played'
+      'user-read-recently-played',
+      'user-modify-playback-state',
+      'user-read-playback-state',
+      'streaming'
     ].join(' ');
     
     const authUrl = `https://accounts.spotify.com/authorize?` +
@@ -38,10 +42,9 @@ const Login = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="mb-8"
         >
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-spotify-green rounded-full mb-4">
-            <Music className="w-10 h-10 text-white" />
+          <div className="flex justify-center mb-4">
+            <Logo size="large" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Stalify</h1>
           <p className="text-spotify-lightGray text-lg">Your Spotify Stats, Amplified</p>
         </motion.div>
 

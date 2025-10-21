@@ -6,6 +6,7 @@ import TrackCard from '../components/TrackCard';
 import ArtistCard from '../components/ArtistCard';
 import GenreChart from '../components/GenreChart';
 import StatsSummary from '../components/StatsSummary';
+import Logo from '../components/Logo';
 
 const Dashboard = () => {
   const { user, accessToken, logout } = useAuth();
@@ -84,66 +85,70 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-spotify-dark">
-      {/* Header */}
-      <header className="bg-spotify-gray border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Music className="w-8 h-8 text-spotify-green" />
-              <div>
-                <h1 className="text-xl font-bold text-white">Stalify</h1>
-                <p className="text-sm text-spotify-lightGray">Welcome back, {user?.display_name}</p>
+          {/* Header */}
+          <header className="bg-spotify-gray border-b border-gray-800 sticky top-0 z-50">
+            <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  <Logo size="small" />
+                  <div>
+                    <p className="text-xs sm:text-sm text-spotify-lightGray hidden sm:block">
+                      Welcome back, {user?.display_name}
+                    </p>
+                    <p className="text-xs text-spotify-lightGray sm:hidden">
+                      {user?.display_name}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  {user?.images?.[0] && (
+                    <img
+                      src={user.images[0].url}
+                      alt={user.display_name}
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
+                    />
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 text-spotify-lightGray hover:text-white transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="hidden sm:inline">Logout</span>
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              {user?.images?.[0] && (
-                <img
-                  src={user.images[0].url}
-                  alt={user.display_name}
-                  className="w-10 h-10 rounded-full"
-                />
-              )}
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 px-4 py-2 text-spotify-lightGray hover:text-white transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
+          </header>
+
+          {/* Navigation Tabs */}
+          <nav className="bg-spotify-gray border-b border-gray-800">
+            <div className="max-w-6xl mx-auto px-4">
+              <div className="flex space-x-2 sm:space-x-8 overflow-x-auto">
+                {[
+                  { id: 'overview', label: 'Overview', icon: BarChart3 },
+                  { id: 'tracks', label: 'Top Tracks', icon: Music },
+                  { id: 'artists', label: 'Top Artists', icon: User },
+                  { id: 'genres', label: 'Genres', icon: TrendingUp },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-2 sm:px-2 border-b-2 transition-colors whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? 'border-spotify-green text-white'
+                        : 'border-transparent text-spotify-lightGray hover:text-white'
+                    }`}
+                  >
+                    <tab.icon className="w-4 h-4" />
+                    <span className="text-sm sm:text-base">{tab.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        </div>
-      </header>
+          </nav>
 
-      {/* Navigation Tabs */}
-      <nav className="bg-spotify-gray border-b border-gray-800">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex space-x-8">
-            {[
-              { id: 'overview', label: 'Overview', icon: BarChart3 },
-              { id: 'tracks', label: 'Top Tracks', icon: Music },
-              { id: 'artists', label: 'Top Artists', icon: User },
-              { id: 'genres', label: 'Genres', icon: TrendingUp },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-4 px-2 border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-spotify-green text-white'
-                    : 'border-transparent text-spotify-lightGray hover:text-white'
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
+          {/* Main Content */}
+          <main className="max-w-6xl mx-auto px-4 py-4 sm:py-8">
         {activeTab === 'overview' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -154,58 +159,58 @@ const Dashboard = () => {
           </motion.div>
         )}
 
-        {activeTab === 'tracks' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Your Top Tracks</h2>
-                <div className="grid gap-4">
-                  {stats?.topTracks?.mediumTerm?.items?.slice(0, 10).map((track, index) => (
-                    <TrackCard key={track.id} track={track} rank={index + 1} />
-                  ))}
+            {activeTab === 'tracks' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="space-y-4 sm:space-y-8">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Your Top Tracks</h2>
+                    <div className="grid gap-3 sm:gap-4">
+                      {stats?.topTracks?.mediumTerm?.items?.slice(0, 10).map((track, index) => (
+                        <TrackCard key={track.id} track={track} rank={index + 1} />
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
+              </motion.div>
+            )}
 
-        {activeTab === 'artists' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Your Top Artists</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {stats?.topArtists?.mediumTerm?.items?.slice(0, 12).map((artist, index) => (
-                    <ArtistCard key={artist.id} artist={artist} rank={index + 1} />
-                  ))}
+            {activeTab === 'artists' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="space-y-4 sm:space-y-8">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Your Top Artists</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                      {stats?.topArtists?.mediumTerm?.items?.slice(0, 12).map((artist, index) => (
+                        <ArtistCard key={artist.id} artist={artist} rank={index + 1} />
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
+              </motion.div>
+            )}
 
-        {activeTab === 'genres' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Your Music Taste</h2>
-                <GenreChart genres={stats?.genreDistribution} />
-              </div>
-            </div>
-          </motion.div>
-        )}
+            {activeTab === 'genres' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="space-y-4 sm:space-y-8">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Your Music Taste</h2>
+                    <GenreChart genres={stats?.genreDistribution} />
+                  </div>
+                </div>
+              </motion.div>
+            )}
       </main>
     </div>
   );
