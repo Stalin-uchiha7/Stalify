@@ -64,6 +64,27 @@ app.get('/api/env-test', (req, res) => {
   });
 });
 
+// Debug OAuth endpoint
+app.get('/api/debug-oauth', (req, res) => {
+  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
+  const scopes = ['user-read-private', 'user-read-email', 'user-top-read', 'user-read-recently-played'].join(' ');
+  
+  const authUrl = `https://accounts.spotify.com/authorize?` +
+    `client_id=${clientId}&` +
+    `response_type=code&` +
+    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+    `scope=${encodeURIComponent(scopes)}&` +
+    `show_dialog=true`;
+    
+  res.json({
+    clientId,
+    redirectUri,
+    authUrl,
+    scopes
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
