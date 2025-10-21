@@ -51,6 +51,19 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Environment variables test endpoint
+app.get('/api/env-test', (req, res) => {
+  res.json({
+    SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID ? 'SET' : 'NOT SET',
+    SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET ? 'SET' : 'NOT SET',
+    SPOTIFY_REDIRECT_URI: process.env.SPOTIFY_REDIRECT_URI || 'NOT SET',
+    JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
+    MONGODB_URI: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+    FRONTEND_URL: process.env.FRONTEND_URL || 'NOT SET',
+    NODE_ENV: process.env.NODE_ENV || 'NOT SET'
+  });
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
