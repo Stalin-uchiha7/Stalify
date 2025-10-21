@@ -147,7 +147,7 @@ const About = () => {
               </a>
             </div>
             <p className="text-spotify-lightGray text-sm">
-              Made with ❤️ and 🎵 by [Your Name]
+              Made with ❤️ and 🎵 by Stalin
             </p>
             <p className="text-spotify-lightGray text-xs">
               This project is not affiliated with Spotify AB.
