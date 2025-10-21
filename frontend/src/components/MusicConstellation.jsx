@@ -6,9 +6,11 @@ const MusicConstellation = ({ artists, tracks }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (!artists || artists.length === 0) return;
+    if (!artists || !Array.isArray(artists) || artists.length === 0) return;
 
     const canvas = canvasRef.current;
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
     
     // Set canvas size
@@ -90,7 +92,7 @@ const MusicConstellation = ({ artists, tracks }) => {
 
   }, [artists]);
 
-  if (!artists || artists.length === 0) {
+  if (!artists || !Array.isArray(artists) || artists.length === 0) {
     return (
       <div className="bg-spotify-gray rounded-lg p-8 text-center">
         <p className="text-spotify-lightGray">Loading music constellation...</p>

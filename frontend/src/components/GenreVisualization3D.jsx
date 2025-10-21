@@ -6,9 +6,11 @@ const GenreVisualization3D = ({ genres }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (!genres || genres.length === 0) return;
+    if (!genres || (typeof genres === 'object' && Object.keys(genres).length === 0)) return;
 
     const canvas = canvasRef.current;
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
     
     // Set canvas size
@@ -18,8 +20,23 @@ const GenreVisualization3D = ({ genres }) => {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Handle different genres data formats
+    let genresData = {};
+    if (Array.isArray(genres)) {
+      // If it's an array, convert to object
+      genres.forEach(genre => {
+        if (typeof genre === 'string') {
+          genresData[genre] = 1;
+        } else if (genre && genre.name) {
+          genresData[genre.name] = genre.count || 1;
+        }
+      });
+    } else if (typeof genres === 'object') {
+      genresData = genres;
+    }
+
     // Sort genres by count
-    const sortedGenres = Object.entries(genres)
+    const sortedGenres = Object.entries(genresData)
       .sort(([,a], [,b]) => b - a)
       .slice(0, 8);
 
@@ -101,7 +118,21 @@ const GenreVisualization3D = ({ genres }) => {
 
   }, [genres]);
 
-  if (!genres || Object.keys(genres).length === 0) {
+  // Handle different genres data formats for display
+  let genresData = {};
+  if (Array.isArray(genres)) {
+    genres.forEach(genre => {
+      if (typeof genre === 'string') {
+        genresData[genre] = 1;
+      } else if (genre && genre.name) {
+        genresData[genre.name] = genre.count || 1;
+      }
+    });
+  } else if (typeof genres === 'object' && genres !== null) {
+    genresData = genres;
+  }
+
+  if (!genres || Object.keys(genresData).length === 0) {
     return (
       <div className="bg-spotify-gray rounded-lg p-8 text-center">
         <p className="text-spotify-lightGray">Loading 3D genre visualization...</p>
@@ -109,7 +140,7 @@ const GenreVisualization3D = ({ genres }) => {
     );
   }
 
-  const topGenres = Object.entries(genres)
+  const topGenres = Object.entries(genresData)
     .sort(([,a], [,b]) => b - a)
     .slice(0, 5);
 
@@ -136,7 +167,7 @@ const GenreVisualization3D = ({ genres }) => {
         <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3">
           <div className="flex items-center space-x-2 text-sm text-white">
             <Target className="w-4 h-4 text-spotify-green" />
-            <span>{Object.keys(genres).length} genres explored</span>
+            <span>{Object.keys(genresData).length} genres explored</span>
           </div>
         </div>
         
@@ -182,7 +213,7 @@ const GenreVisualization3D = ({ genres }) => {
         <div className="text-sm text-spotify-lightGray space-y-1">
           <p>• Larger spheres represent more popular genres in your taste</p>
           <p>• Connected genres show musical relationships</p>
-          <p>• Your music universe spans {Object.keys(genres).length} different genres</p>
+          <p>• Your music universe spans {Object.keys(genresData).length} different genres</p>
         </div>
       </div>
     </motion.div>

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Calendar, Clock, Activity } from 'lucide-react';
 
 const HeatMap = ({ patterns }) => {
-  if (!patterns || !patterns.peakHours || !patterns.peakDays) {
+  if (!patterns || (!patterns.peakHours && !patterns.peakDays)) {
     return (
       <div className="bg-spotify-gray rounded-lg p-8 text-center">
         <p className="text-spotify-lightGray">Loading heat map...</p>
