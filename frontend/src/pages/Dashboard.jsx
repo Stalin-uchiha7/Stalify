@@ -7,9 +7,11 @@ import ArtistCard from '../components/ArtistCard';
 import GenreChart from '../components/GenreChart';
 import StatsSummary from '../components/StatsSummary';
 import Logo from '../components/Logo';
+import { useApiWithRefresh } from '../hooks/useApiWithRefresh';
 
 const Dashboard = () => {
-  const { user, accessToken, logout } = useAuth();
+  const { user, logout } = useAuth();
+  const { makeRequest } = useApiWithRefresh();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,11 +26,8 @@ const Dashboard = () => {
       setLoading(true);
       const apiUrl = 'https://stalify.onrender.com';
       console.log('Fetching stats from:', `${apiUrl}/api/stats/summary`);
-      const response = await fetch(`${apiUrl}/api/stats/summary`, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
+      
+      const response = await makeRequest(`${apiUrl}/api/stats/summary`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch user stats');

@@ -53,8 +53,8 @@ const Callback = () => {
 
         const data = await response.json();
         
-        // Store tokens and user data
-        login(data.accessToken, data.user);
+            // Store tokens and user data
+            login(data.accessToken, data.user, data.refreshToken);
         setStatus('success');
         
         // Redirect to dashboard after a short delay

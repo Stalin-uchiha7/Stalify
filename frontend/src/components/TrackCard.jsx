@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import { Play, Pause, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import useSpotifyPlayer from '../hooks/useSpotifyPlayer';
+import { useApiWithRefresh } from '../hooks/useApiWithRefresh';
 
 const TrackCard = ({ track, rank }) => {
   const { accessToken } = useAuth();
+  const { makeRequest } = useApiWithRefresh();
   const { isReady, isPlaying, currentTrack, playTrack, togglePlayback } = useSpotifyPlayer(accessToken);
   
   const formatDuration = (ms) => {
