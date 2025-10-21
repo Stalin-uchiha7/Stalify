@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User, Music, BarChart3, Clock, TrendingUp, Settings } from 'lucide-react';
+import { LogOut, User, Music, BarChart3, Clock, TrendingUp, Settings, Brain, Activity } from 'lucide-react';
 import TrackCard from '../components/TrackCard';
 import ArtistCard from '../components/ArtistCard';
 import GenreChart from '../components/GenreChart';
 import StatsSummary from '../components/StatsSummary';
+import ListeningPatterns from '../components/ListeningPatterns';
+import MusicPersonality from '../components/MusicPersonality';
+import AudioFeatures from '../components/AudioFeatures';
 import Logo from '../components/Logo';
 import { useApiWithRefresh } from '../hooks/useApiWithRefresh';
 
@@ -13,12 +16,16 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const { makeRequest } = useApiWithRefresh();
   const [stats, setStats] = useState(null);
+  const [listeningPatterns, setListeningPatterns] = useState(null);
+  const [musicPersonality, setMusicPersonality] = useState(null);
+  const [audioFeatures, setAudioFeatures] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     fetchUserStats();
+    fetchAnalyticsData();
   }, []);
 
   const fetchUserStats = async () => {
@@ -40,6 +47,37 @@ const Dashboard = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAnalyticsData = async () => {
+    try {
+      const apiUrl = 'https://stalify.onrender.com';
+      
+      // Fetch all analytics data in parallel
+      const [patternsRes, personalityRes, featuresRes] = await Promise.all([
+        makeRequest(`${apiUrl}/api/analytics/listening-patterns`),
+        makeRequest(`${apiUrl}/api/analytics/music-personality`),
+        makeRequest(`${apiUrl}/api/analytics/audio-features`)
+      ]);
+
+      if (patternsRes.ok) {
+        const patternsData = await patternsRes.json();
+        setListeningPatterns(patternsData.data);
+      }
+
+      if (personalityRes.ok) {
+        const personalityData = await personalityRes.json();
+        setMusicPersonality(personalityData.data);
+      }
+
+      if (featuresRes.ok) {
+        const featuresData = await featuresRes.json();
+        setAudioFeatures(featuresData.data);
+      }
+    } catch (err) {
+      console.error('Error fetching analytics data:', err);
+      // Don't set error state for analytics - they're supplementary
     }
   };
 
@@ -132,14 +170,17 @@ const Dashboard = () => {
           {/* Navigation Tabs */}
           <nav className="bg-spotify-gray border-b border-gray-800">
             <div className="max-w-6xl mx-auto px-4">
-              <div className="flex space-x-1 sm:space-x-8 overflow-x-auto">
-                {[
-                  { id: 'overview', label: 'Overview', icon: BarChart3 },
-                  { id: 'tracks', label: 'Top Tracks', icon: Music },
-                  { id: 'artists', label: 'Top Artists', icon: User },
-                  { id: 'genres', label: 'Genres', icon: TrendingUp },
-                  { id: 'profile', label: 'Profile', icon: Settings },
-                ].map((tab) => (
+                  <div className="flex space-x-1 sm:space-x-8 overflow-x-auto">
+                    {[
+                      { id: 'overview', label: 'Overview', icon: BarChart3 },
+                      { id: 'tracks', label: 'Top Tracks', icon: Music },
+                      { id: 'artists', label: 'Top Artists', icon: User },
+                      { id: 'genres', label: 'Genres', icon: TrendingUp },
+                      { id: 'patterns', label: 'Patterns', icon: Clock },
+                      { id: 'personality', label: 'Personality', icon: Brain },
+                      { id: 'features', label: 'Audio Features', icon: Activity },
+                      { id: 'profile', label: 'Profile', icon: Settings },
+                    ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
@@ -207,20 +248,65 @@ const Dashboard = () => {
               </motion.div>
             )}
 
-            {activeTab === 'genres' && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <div className="space-y-4 sm:space-y-8">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Your Music Taste</h2>
-                    <GenreChart genres={stats?.genreDistribution} />
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                {activeTab === 'genres' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <div className="space-y-4 sm:space-y-8">
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Your Music Taste</h2>
+                        <GenreChart genres={stats?.genreDistribution} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'patterns' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <div className="space-y-4 sm:space-y-8">
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Listening Patterns</h2>
+                        <ListeningPatterns patterns={listeningPatterns} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'personality' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <div className="space-y-4 sm:space-y-8">
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Music Personality</h2>
+                        <MusicPersonality personality={musicPersonality} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'features' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <div className="space-y-4 sm:space-y-8">
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Audio Features</h2>
+                        <AudioFeatures features={audioFeatures} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
             {activeTab === 'profile' && (
               <motion.div

@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 // Import routes
 const authRoutes = require('./routes/auth');
 const statsRoutes = require('./routes/stats');
+const analyticsRoutes = require('./routes/analytics');
 
 // Load environment variables
 dotenv.config();
@@ -41,6 +42,7 @@ if (process.env.MONGODB_URI) {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
