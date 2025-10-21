@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User, Music, BarChart3, Clock, TrendingUp } from 'lucide-react';
+import { LogOut, User, Music, BarChart3, Clock, TrendingUp, Settings } from 'lucide-react';
 import TrackCard from '../components/TrackCard';
 import ArtistCard from '../components/ArtistCard';
 import GenreChart from '../components/GenreChart';
@@ -129,13 +129,14 @@ const Dashboard = () => {
                   { id: 'tracks', label: 'Top Tracks', icon: Music },
                   { id: 'artists', label: 'Top Artists', icon: User },
                   { id: 'genres', label: 'Genres', icon: TrendingUp },
+                  { id: 'profile', label: 'Profile', icon: Settings },
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-2 sm:px-2 border-b-2 transition-colors whitespace-nowrap ${
+                    className={`flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-2 sm:px-2 border-b transition-colors whitespace-nowrap ${
                       activeTab === tab.id
-                        ? 'border-spotify-green text-white'
+                        ? 'border-spotify-green text-white border-b-2 sm:border-b-2'
                         : 'border-transparent text-spotify-lightGray hover:text-white'
                     }`}
                   >
@@ -207,6 +208,76 @@ const Dashboard = () => {
                   <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Your Music Taste</h2>
                     <GenreChart genres={stats?.genreDistribution} />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'profile' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="space-y-4 sm:space-y-8">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Your Profile</h2>
+                    
+                    {/* Profile Card */}
+                    <div className="bg-spotify-gray rounded-lg p-6">
+                      <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+                        {user?.images?.[0] && (
+                          <img
+                            src={user.images[0].url}
+                            alt={user.display_name}
+                            className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover"
+                          />
+                        )}
+                        <div className="text-center sm:text-left">
+                          <h3 className="text-2xl font-bold text-white mb-2">{user?.display_name}</h3>
+                          <p className="text-spotify-lightGray mb-4">{user?.email}</p>
+                          <div className="grid grid-cols-2 gap-4 text-center sm:text-left">
+                            <div>
+                              <p className="text-spotify-lightGray text-sm">Country</p>
+                              <p className="text-white font-medium">{user?.country || 'Unknown'}</p>
+                            </div>
+                            <div>
+                              <p className="text-spotify-lightGray text-sm">Followers</p>
+                              <p className="text-white font-medium">{user?.followers?.toLocaleString() || '0'}</p>
+                            </div>
+                            <div>
+                              <p className="text-spotify-lightGray text-sm">Plan</p>
+                              <p className="text-white font-medium capitalize">{user?.product || 'Unknown'}</p>
+                            </div>
+                            <div>
+                              <p className="text-spotify-lightGray text-sm">Spotify ID</p>
+                              <p className="text-white font-medium text-xs">{user?.id || 'Unknown'}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Account Actions */}
+                    <div className="bg-spotify-gray rounded-lg p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4">Account Actions</h3>
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => window.open(user?.external_urls?.spotify, '_blank')}
+                          className="w-full sm:w-auto px-4 py-2 bg-spotify-green text-white rounded-full hover:bg-green-500 transition-colors flex items-center justify-center space-x-2"
+                        >
+                          <Music className="w-4 h-4" />
+                          <span>Open Spotify Profile</span>
+                        </button>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
