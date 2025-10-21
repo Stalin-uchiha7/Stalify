@@ -90,23 +90,33 @@ const Dashboard = () => {
             <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 sm:space-x-4">
-                  <Logo size="small" />
-                  <div>
-                    <p className="text-xs sm:text-sm text-spotify-lightGray hidden sm:block">
-                      Welcome back, {user?.display_name}
-                    </p>
-                    <p className="text-xs text-spotify-lightGray sm:hidden">
-                      {user?.display_name}
-                    </p>
-                  </div>
+                  <button 
+                    onClick={() => setActiveTab('profile')}
+                    className="flex items-center space-x-2 sm:space-x-4 hover:opacity-80 transition-opacity"
+                  >
+                    <Logo size="small" />
+                    <div>
+                      <p className="text-xs sm:text-sm text-spotify-lightGray hidden sm:block">
+                        Welcome back, {user?.display_name}
+                      </p>
+                      <p className="text-xs text-spotify-lightGray sm:hidden">
+                        {user?.display_name}
+                      </p>
+                    </div>
+                  </button>
                 </div>
                 <div className="flex items-center space-x-2 sm:space-x-4">
                   {user?.images?.[0] && (
-                    <img
-                      src={user.images[0].url}
-                      alt={user.display_name}
-                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
-                    />
+                    <button
+                      onClick={() => setActiveTab('profile')}
+                      className="hover:opacity-80 transition-opacity"
+                    >
+                      <img
+                        src={user.images[0].url}
+                        alt={user.display_name}
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
+                      />
+                    </button>
                   )}
                   <button
                     onClick={handleLogout}
@@ -123,7 +133,7 @@ const Dashboard = () => {
           {/* Navigation Tabs */}
           <nav className="bg-spotify-gray border-b border-gray-800">
             <div className="max-w-6xl mx-auto px-4">
-              <div className="flex space-x-2 sm:space-x-8 overflow-x-auto">
+              <div className="flex space-x-1 sm:space-x-8 overflow-x-auto">
                 {[
                   { id: 'overview', label: 'Overview', icon: BarChart3 },
                   { id: 'tracks', label: 'Top Tracks', icon: Music },
@@ -134,7 +144,7 @@ const Dashboard = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-2 sm:px-2 border-b transition-colors whitespace-nowrap ${
+                    className={`flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-1 sm:px-2 border-b transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'border-spotify-green text-white border-b-2 sm:border-b-2'
                         : 'border-transparent text-spotify-lightGray hover:text-white'
@@ -251,7 +261,7 @@ const Dashboard = () => {
                             </div>
                             <div>
                               <p className="text-spotify-lightGray text-sm">Spotify ID</p>
-                              <p className="text-white font-medium text-xs">{user?.id || 'Unknown'}</p>
+                              <p className="text-white font-medium text-xs break-all">{user?.id || 'Unknown'}</p>
                             </div>
                           </div>
                         </div>
