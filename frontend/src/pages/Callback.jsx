@@ -32,7 +32,7 @@ const Callback = () => {
         }
 
         // Exchange code for tokens
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://stalify.onrender.com'}/api/auth/token`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://stalify.onrender.com'}/api/auth/callback`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
