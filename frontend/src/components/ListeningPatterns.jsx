@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Calendar, Repeat, TrendingUp, BarChart3 } from 'lucide-react';
+import { Clock, Calendar, Repeat, TrendingUp, BarChart3, SkipForward, Timer, Activity, Zap } from 'lucide-react';
 
 const ListeningPatterns = ({ patterns }) => {
   if (!patterns) {
@@ -23,6 +23,37 @@ const ListeningPatterns = ({ patterns }) => {
     return `${hour - 12} PM`;
   };
 
+  const getTimeOfDay = (hour) => {
+    if (hour >= 5 && hour < 12) return 'Morning';
+    if (hour >= 12 && hour < 17) return 'Afternoon';
+    if (hour >= 17 && hour < 21) return 'Evening';
+    return 'Night';
+  };
+
+  const getListeningInsight = () => {
+    if (!patterns.peakHours || patterns.peakHours.length === 0) return '';
+    
+    const topHour = patterns.peakHours[0];
+    const timeOfDay = getTimeOfDay(topHour.hour);
+    
+    if (timeOfDay === 'Morning') return "You're a morning music lover! 🌅";
+    if (timeOfDay === 'Afternoon') return "Music fuels your afternoons! ☀️";
+    if (timeOfDay === 'Evening') return "Evening vibes are your thing! 🌆";
+    return "Night owl music sessions! 🌙";
+  };
+
+  const getDiscoveryInsight = () => {
+    if (patterns.discoveryRate > 70) return "You're a true music explorer! 🎵";
+    if (patterns.discoveryRate > 40) return "You balance discovery with favorites! ⚖️";
+    return "You love your comfort music! 💚";
+  };
+
+  const getRepeatInsight = () => {
+    if (patterns.repeatRate > 50) return "You love replaying your favorites! 🔄";
+    if (patterns.repeatRate > 20) return "You enjoy some repetition! 🎶";
+    return "Always something new for you! ✨";
+  };
+
   return (
     <div className="space-y-6">
       {/* Peak Hours */}
@@ -32,21 +63,54 @@ const ListeningPatterns = ({ patterns }) => {
         transition={{ duration: 0.6 }}
         className="bg-spotify-gray rounded-lg p-6"
       >
-        <div className="flex items-center space-x-2 mb-4">
-          <Clock className="w-5 h-5 text-spotify-green" />
-          <h3 className="text-lg font-semibold text-white">Peak Listening Hours</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Clock className="w-5 h-5 text-spotify-green" />
+            <h3 className="text-lg font-semibold text-white">Peak Listening Hours</h3>
+          </div>
+          <div className="text-sm text-spotify-lightGray">
+            {getListeningInsight()}
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {patterns.peakHours?.map((peak, index) => (
-            <div key={index} className="text-center">
-              <div className="text-2xl font-bold text-spotify-green mb-1">
-                {getHourLabel(peak.hour)}
+        
+        <div className="space-y-4">
+          {patterns.peakHours?.map((peak, index) => {
+            const maxCount = Math.max(...patterns.peakHours.map(p => p.count));
+            const percentage = (peak.count / maxCount) * 100;
+            
+            return (
+              <div key={index} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-spotify-green/20 rounded-full flex items-center justify-center">
+                      <span className="text-spotify-green font-bold text-sm">#{index + 1}</span>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-white">
+                        {getHourLabel(peak.hour)}
+                      </div>
+                      <div className="text-xs text-spotify-lightGray">
+                        {getTimeOfDay(peak.hour)} • {peak.count} plays
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-spotify-green">
+                      {peak.count} plays
+                    </div>
+                  </div>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${percentage}%` }}
+                    transition={{ duration: 1, delay: index * 0.2 }}
+                    className="bg-gradient-to-r from-spotify-green to-green-400 h-2 rounded-full"
+                  ></motion.div>
+                </div>
               </div>
-              <div className="text-spotify-lightGray text-sm">
-                {peak.count} plays
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </motion.div>
 
@@ -62,22 +126,41 @@ const ListeningPatterns = ({ patterns }) => {
           <h3 className="text-lg font-semibold text-white">Peak Listening Days</h3>
         </div>
         <div className="space-y-3">
-          {patterns.peakDays?.map((day, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <span className="text-white font-medium">{day.day}</span>
-              <div className="flex items-center space-x-2">
-                <div className="w-24 bg-gray-700 rounded-full h-2">
-                  <div 
-                    className="bg-spotify-green h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(day.count / Math.max(...patterns.peakDays.map(d => d.count))) * 100}%` }}
-                  ></div>
+          {patterns.peakDays?.map((day, index) => {
+            const maxCount = Math.max(...patterns.peakDays.map(d => d.count));
+            const percentage = (day.count / maxCount) * 100;
+            
+            return (
+              <div key={index} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-blue-400 font-bold text-sm">#{index + 1}</span>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-white">{day.day}</div>
+                      <div className="text-xs text-spotify-lightGray">
+                        {day.count} plays • {percentage.toFixed(0)}% of peak
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-blue-400">
+                      {day.count} plays
+                    </div>
+                  </div>
                 </div>
-                <span className="text-spotify-lightGray text-sm w-12 text-right">
-                  {day.count}
-                </span>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${percentage}%` }}
+                    transition={{ duration: 1, delay: 0.3 + (index * 0.2) }}
+                    className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full"
+                  ></motion.div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </motion.div>
 
@@ -86,7 +169,7 @@ const ListeningPatterns = ({ patterns }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
       >
         {/* Repeat Rate */}
         <div className="bg-spotify-gray rounded-lg p-6 text-center">
@@ -94,11 +177,11 @@ const ListeningPatterns = ({ patterns }) => {
           <div className="text-2xl font-bold text-white mb-1">
             {patterns.repeatRate}%
           </div>
-          <div className="text-spotify-lightGray text-sm">
+          <div className="text-spotify-lightGray text-sm mb-2">
             Repeat Rate
           </div>
-          <div className="text-xs text-spotify-lightGray mt-2">
-            Songs you play multiple times
+          <div className="text-xs text-spotify-lightGray">
+            {getRepeatInsight()}
           </div>
         </div>
 
@@ -108,11 +191,25 @@ const ListeningPatterns = ({ patterns }) => {
           <div className="text-2xl font-bold text-white mb-1">
             {patterns.discoveryRate}%
           </div>
-          <div className="text-spotify-lightGray text-sm">
+          <div className="text-spotify-lightGray text-sm mb-2">
             Discovery Rate
           </div>
-          <div className="text-xs text-spotify-lightGray mt-2">
-            New vs familiar music
+          <div className="text-xs text-spotify-lightGray">
+            {getDiscoveryInsight()}
+          </div>
+        </div>
+
+        {/* Skip Rate */}
+        <div className="bg-spotify-gray rounded-lg p-6 text-center">
+          <SkipForward className="w-8 h-8 text-red-400 mx-auto mb-3" />
+          <div className="text-2xl font-bold text-white mb-1">
+            {patterns.skipRate}%
+          </div>
+          <div className="text-spotify-lightGray text-sm mb-2">
+            Skip Rate
+          </div>
+          <div className="text-xs text-spotify-lightGray">
+            Songs you skip before finishing
           </div>
         </div>
 
@@ -122,11 +219,11 @@ const ListeningPatterns = ({ patterns }) => {
           <div className="text-2xl font-bold text-white mb-1">
             {patterns.listeningStreak}
           </div>
-          <div className="text-spotify-lightGray text-sm">
+          <div className="text-spotify-lightGray text-sm mb-2">
             Day Streak
           </div>
-          <div className="text-xs text-spotify-lightGray mt-2">
-            Consecutive listening days
+          <div className="text-xs text-spotify-lightGray">
+            {patterns.listeningStreak > 0 ? "Keep the music going! 🔥" : "Start your streak today! 🎵"}
           </div>
         </div>
       </motion.div>
