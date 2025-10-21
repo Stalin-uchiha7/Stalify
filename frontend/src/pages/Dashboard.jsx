@@ -21,7 +21,9 @@ const Dashboard = () => {
   const fetchUserStats = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/stats/summary`, {
+      const apiUrl = 'https://stalify.onrender.com';
+      console.log('Fetching stats from:', `${apiUrl}/api/stats/summary`);
+      const response = await fetch(`${apiUrl}/api/stats/summary`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
