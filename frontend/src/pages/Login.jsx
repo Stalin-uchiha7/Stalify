@@ -88,6 +88,15 @@ const Login = () => {
         >
           <p>By connecting, you agree to share your Spotify data with Stalify.</p>
           <p className="mt-1">Your data is used only to generate your music insights.</p>
+          
+          {/* Help note */}
+          <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
+            <p className="text-yellow-300 text-xs">
+              <strong>Having trouble connecting?</strong> If you see a "user not registered" error, 
+              this app is in development mode. Please contact the developer to add your Spotify account 
+              to the test users list.
+            </p>
+          </div>
         </motion.div>
       </motion.div>
     </div>

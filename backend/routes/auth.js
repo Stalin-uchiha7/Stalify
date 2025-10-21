@@ -57,9 +57,29 @@ router.post('/callback', async (req, res) => {
 
   } catch (error) {
     console.error('Auth callback error:', error);
+    
+    // Handle specific Spotify API errors
+    let errorMessage = 'Authentication failed';
+    let userFriendlyMessage = 'Something went wrong during authentication. Please try again.';
+    
+    if (error.message.includes('user may not be registered')) {
+      errorMessage = 'User not registered in Spotify app';
+      userFriendlyMessage = 'Your Spotify account is not registered for this app. Please contact the developer or try again later.';
+    } else if (error.message.includes('invalid_grant')) {
+      errorMessage = 'Invalid authorization code';
+      userFriendlyMessage = 'The authorization code has expired or is invalid. Please try logging in again.';
+    } else if (error.message.includes('INVALID_CLIENT')) {
+      errorMessage = 'Invalid Spotify app configuration';
+      userFriendlyMessage = 'There\'s an issue with the Spotify app configuration. Please try again later.';
+    } else if (error.message.includes('access_denied')) {
+      errorMessage = 'User denied access';
+      userFriendlyMessage = 'You denied access to your Spotify account. Please try again and grant the necessary permissions.';
+    }
+    
     res.status(500).json({ 
-      error: 'Authentication failed',
-      message: error.message 
+      error: errorMessage,
+      message: userFriendlyMessage,
+      details: error.message
     });
   }
 });

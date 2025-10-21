@@ -48,13 +48,14 @@ const Callback = () => {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to exchange code for tokens');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to exchange code for tokens');
         }
 
         const data = await response.json();
         
-            // Store tokens and user data
-            login(data.accessToken, data.user, data.refreshToken);
+        // Store tokens and user data
+        login(data.accessToken, data.user, data.refreshToken);
         setStatus('success');
         
         // Redirect to dashboard after a short delay
@@ -62,9 +63,24 @@ const Callback = () => {
         
       } catch (err) {
         console.error('Callback error:', err);
-        setError(err.message || 'An error occurred during authentication.');
+        
+        // Show user-friendly error message
+        let errorMessage = err.message || 'An error occurred during authentication.';
+        
+        // Handle specific error cases
+        if (err.message.includes('not registered')) {
+          errorMessage = 'Your Spotify account is not registered for this app. Please contact the developer or try again later.';
+        } else if (err.message.includes('invalid_grant')) {
+          errorMessage = 'The authorization code has expired. Please try logging in again.';
+        } else if (err.message.includes('INVALID_CLIENT')) {
+          errorMessage = 'There\'s an issue with the Spotify app configuration. Please try again later.';
+        } else if (err.message.includes('access_denied')) {
+          errorMessage = 'You denied access to your Spotify account. Please try again and grant the necessary permissions.';
+        }
+        
+        setError(errorMessage);
         setStatus('error');
-        setTimeout(() => navigate('/login'), 3000);
+        setTimeout(() => navigate('/login'), 5000); // Give more time to read the error
       }
     };
 
@@ -117,12 +133,24 @@ const Callback = () => {
               </p>
             )}
             {status === 'error' && (
-              <button
-                onClick={() => navigate('/login')}
-                className="mt-4 px-4 py-2 bg-spotify-green text-white rounded-full hover:bg-green-500 transition-colors"
-              >
-                Try Again
-              </button>
+              <div className="space-y-4">
+                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                  <p className="text-red-300 text-sm leading-relaxed">
+                    {error}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="px-6 py-2 bg-spotify-green text-white rounded-full hover:bg-green-500 transition-colors font-medium"
+                  >
+                    Try Again
+                  </button>
+                  <p className="text-spotify-lightGray text-xs">
+                    Redirecting to login page in a few seconds...
+                  </p>
+                </div>
+              </div>
             )}
           </div>
         </div>
