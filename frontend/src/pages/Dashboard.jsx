@@ -344,7 +344,7 @@ const Dashboard = () => {
                         
                         {/* Sound Wave Visualization */}
                         <div className="mb-8">
-                          <SoundWaveVisualization features={audioFeatures} />
+                          <SoundWaveVisualization audioFeatures={audioFeatures} />
                         </div>
                       </div>
                     </div>

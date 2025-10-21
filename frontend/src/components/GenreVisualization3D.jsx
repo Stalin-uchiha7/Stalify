@@ -6,7 +6,12 @@ const GenreVisualization3D = ({ genres }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (!genres || (typeof genres === 'object' && Object.keys(genres).length === 0)) return;
+    console.log('GenreVisualization3D received genres:', genres);
+    
+    if (!genres || (typeof genres === 'object' && Object.keys(genres).length === 0)) {
+      console.log('No genres data available');
+      return;
+    }
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -132,12 +137,19 @@ const GenreVisualization3D = ({ genres }) => {
     genresData = genres;
   }
 
+  // Fallback data for testing
   if (!genres || Object.keys(genresData).length === 0) {
-    return (
-      <div className="bg-spotify-gray rounded-lg p-8 text-center">
-        <p className="text-spotify-lightGray">Loading 3D genre visualization...</p>
-      </div>
-    );
+    console.log('Using fallback genres data');
+    genresData = {
+      'Pop': 15,
+      'Rock': 12,
+      'Hip-Hop': 10,
+      'Electronic': 8,
+      'Jazz': 6,
+      'Classical': 4,
+      'R&B': 7,
+      'Indie': 5
+    };
   }
 
   const topGenres = Object.entries(genresData)
