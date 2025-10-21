@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User, Music, BarChart3, Clock, TrendingUp, Settings, Brain, Activity } from 'lucide-react';
+import { LogOut, User, Music, BarChart3, Clock, TrendingUp, Settings, Brain, Activity, Eye } from 'lucide-react';
 import TrackCard from '../components/TrackCard';
 import ArtistCard from '../components/ArtistCard';
 import GenreChart from '../components/GenreChart';
@@ -9,6 +9,10 @@ import StatsSummary from '../components/StatsSummary';
 import ListeningPatterns from '../components/ListeningPatterns';
 import MusicPersonality from '../components/MusicPersonality';
 import AudioFeatures from '../components/AudioFeatures';
+import MusicConstellation from '../components/MusicConstellation';
+import HeatMap from '../components/HeatMap';
+import SoundWaveVisualization from '../components/SoundWaveVisualization';
+import GenreVisualization3D from '../components/GenreVisualization3D';
 import Logo from '../components/Logo';
 import { useApiWithRefresh } from '../hooks/useApiWithRefresh';
 
@@ -179,6 +183,7 @@ const Dashboard = () => {
                   { id: 'patterns', label: 'Patterns', shortLabel: 'Patterns', icon: Clock },
                   { id: 'personality', label: 'Personality', shortLabel: 'Personality', icon: Brain },
                   { id: 'features', label: 'Audio Features', shortLabel: 'Features', icon: Activity },
+                  { id: 'visualizations', label: 'Visualizations', shortLabel: 'Viz', icon: Eye },
                   { id: 'profile', label: 'Profile', shortLabel: 'Profile', icon: Settings },
                 ].map((tab) => (
                   <button
@@ -304,6 +309,43 @@ const Dashboard = () => {
                       <div>
                         <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Audio Features</h2>
                         <AudioFeatures features={audioFeatures} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'visualizations' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <div className="space-y-6 sm:space-y-8">
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Advanced Visualizations</h2>
+                        
+                        {/* 3D Genre Visualization */}
+                        <div className="mb-8">
+                          <GenreVisualization3D genres={stats?.genreDistribution} />
+                        </div>
+                        
+                        {/* Music Constellation */}
+                        <div className="mb-8">
+                          <MusicConstellation 
+                            artists={stats?.topArtists?.mediumTerm?.items} 
+                            tracks={stats?.topTracks?.mediumTerm?.items} 
+                          />
+                        </div>
+                        
+                        {/* Heat Map */}
+                        <div className="mb-8">
+                          <HeatMap patterns={listeningPatterns} />
+                        </div>
+                        
+                        {/* Sound Wave Visualization */}
+                        <div className="mb-8">
+                          <SoundWaveVisualization features={audioFeatures} />
+                        </div>
                       </div>
                     </div>
                   </motion.div>
