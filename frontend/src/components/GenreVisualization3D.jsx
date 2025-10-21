@@ -1,128 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Music, Target, Zap } from 'lucide-react';
 
 const GenreVisualization3D = ({ genres }) => {
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    console.log('GenreVisualization3D received genres:', genres);
-    
-    if (!genres || (typeof genres === 'object' && Object.keys(genres).length === 0)) {
-      console.log('No genres data available');
-      return;
-    }
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    
-    // Set canvas size
-    canvas.width = 500;
-    canvas.height = 400;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Handle different genres data formats
-    let genresData = {};
-    if (Array.isArray(genres)) {
-      // If it's an array, convert to object
-      genres.forEach(genre => {
-        if (typeof genre === 'string') {
-          genresData[genre] = 1;
-        } else if (genre && genre.name) {
-          genresData[genre.name] = genre.count || 1;
-        }
-      });
-    } else if (typeof genres === 'object') {
-      genresData = genres;
-    }
-
-    // Sort genres by count
-    const sortedGenres = Object.entries(genresData)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 8);
-
-    // Create 3D-like spheres for each genre
-    sortedGenres.forEach(([genre, count], index) => {
-      const angle = (index / sortedGenres.length) * 2 * Math.PI;
-      const radius = 80 + Math.random() * 40;
-      const x = canvas.width / 2 + radius * Math.cos(angle);
-      const y = canvas.height / 2 + radius * Math.sin(angle);
-      
-      // Calculate sphere size based on count
-      const maxCount = Math.max(...Object.values(genres));
-      const sphereSize = 20 + (count / maxCount) * 40;
-      
-      // Create gradient for 3D effect
-      const gradient = ctx.createRadialGradient(
-        x - sphereSize/4, y - sphereSize/4, 0,
-        x, y, sphereSize
-      );
-      
-      // Color based on genre
-      const colors = [
-        '#1DB954', '#FF6B6B', '#4ECDC4', '#45B7D1',
-        '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'
-      ];
-      const color = colors[index % colors.length];
-      
-      gradient.addColorStop(0, `${color}CC`);
-      gradient.addColorStop(0.7, `${color}88`);
-      gradient.addColorStop(1, `${color}44`);
-      
-      // Draw sphere
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(x, y, sphereSize, 0, 2 * Math.PI);
-      ctx.fill();
-      
-      // Draw highlight
-      ctx.fillStyle = `${color}AA`;
-      ctx.beginPath();
-      ctx.arc(x - sphereSize/3, y - sphereSize/3, sphereSize/3, 0, 2 * Math.PI);
-      ctx.fill();
-      
-      // Draw genre name
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = 'bold 12px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(genre, x, y + sphereSize + 20);
-      
-      // Draw count
-      ctx.fillStyle = '#B3B3B3';
-      ctx.font = '10px Inter, sans-serif';
-      ctx.fillText(`${count}`, x, y + sphereSize + 35);
-    });
-
-    // Draw connections between related genres
-    for (let i = 0; i < sortedGenres.length; i++) {
-      for (let j = i + 1; j < sortedGenres.length; j++) {
-        if (Math.random() > 0.6) {
-          const angle1 = (i / sortedGenres.length) * 2 * Math.PI;
-          const angle2 = (j / sortedGenres.length) * 2 * Math.PI;
-          const radius1 = 80 + Math.random() * 40;
-          const radius2 = 80 + Math.random() * 40;
-          
-          const x1 = canvas.width / 2 + radius1 * Math.cos(angle1);
-          const y1 = canvas.height / 2 + radius1 * Math.sin(angle1);
-          const x2 = canvas.width / 2 + radius2 * Math.cos(angle2);
-          const y2 = canvas.height / 2 + radius2 * Math.sin(angle2);
-          
-          ctx.beginPath();
-          ctx.strokeStyle = 'rgba(29, 185, 84, 0.3)';
-          ctx.lineWidth = 1;
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
-          ctx.stroke();
-        }
-      }
-    }
-
-  }, [genres]);
-
   // Handle different genres data formats for display
   let genresData = {};
   if (Array.isArray(genres)) {
@@ -154,7 +34,14 @@ const GenreVisualization3D = ({ genres }) => {
 
   const topGenres = Object.entries(genresData)
     .sort(([,a], [,b]) => b - a)
-    .slice(0, 5);
+    .slice(0, 8);
+
+  const totalCount = Object.values(genresData).reduce((sum, count) => sum + count, 0);
+  
+  const colors = [
+    '#1DB954', '#FF6B6B', '#4ECDC4', '#45B7D1',
+    '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'
+  ];
 
   return (
     <motion.div
@@ -165,67 +52,64 @@ const GenreVisualization3D = ({ genres }) => {
     >
       <div className="flex items-center space-x-2 mb-6">
         <Music className="w-5 h-5 text-spotify-green" />
-        <h3 className="text-lg font-semibold text-white">3D Genre Universe</h3>
+        <h3 className="text-lg font-semibold text-white">Genre Distribution</h3>
       </div>
       
-      {/* 3D Canvas */}
-      <div className="relative mb-6">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-96 bg-gradient-to-br from-spotify-dark via-gray-900 to-spotify-dark rounded-lg border border-gray-700"
-        />
-        
-        {/* Overlay info */}
-        <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3">
-          <div className="flex items-center space-x-2 text-sm text-white">
-            <Target className="w-4 h-4 text-spotify-green" />
-            <span>{Object.keys(genresData).length} genres explored</span>
-          </div>
-        </div>
-        
-        <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg p-3">
-          <div className="flex items-center space-x-2 text-sm text-white">
-            <Zap className="w-4 h-4 text-yellow-400" />
-            <span>Interactive 3D view</span>
-          </div>
+      {/* Simple Pie Chart */}
+      <div className="mb-6 bg-spotify-dark/50 rounded-lg p-4">
+        <div className="grid grid-cols-2 gap-4">
+          {topGenres.map(([genre, count], index) => {
+            const percentage = ((count / totalCount) * 100).toFixed(1);
+            const color = colors[index % colors.length];
+            
+            return (
+              <motion.div
+                key={genre}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="flex items-center space-x-3 p-3 bg-gray-800/50 rounded-lg"
+              >
+                <div 
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: color }}
+                />
+                <div className="flex-1">
+                  <div className="text-white font-medium text-sm">{genre}</div>
+                  <div className="text-spotify-lightGray text-xs">{count} artists</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-white font-bold text-sm">{percentage}%</div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
       
-      {/* Top Genres List */}
-      <div className="space-y-3">
-        <h4 className="text-white font-medium">Top Genres</h4>
-        {topGenres.map(([genre, count], index) => (
-          <motion.div
-            key={genre}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="flex items-center justify-between p-3 bg-spotify-dark/50 rounded-lg"
-          >
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-spotify-green/20 rounded-full flex items-center justify-center">
-                <span className="text-spotify-green font-bold text-sm">#{index + 1}</span>
-              </div>
-              <div>
-                <div className="text-white font-medium">{genre}</div>
-                <div className="text-spotify-lightGray text-sm">{count} artists</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-spotify-green font-bold">{count}</div>
-              <div className="text-spotify-lightGray text-xs">artists</div>
-            </div>
-          </motion.div>
-        ))}
+      {/* Genre Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="text-center p-3 bg-spotify-dark/50 rounded-lg">
+          <div className="text-spotify-green font-bold text-lg">{Object.keys(genresData).length}</div>
+          <div className="text-spotify-lightGray text-xs">Total Genres</div>
+        </div>
+        <div className="text-center p-3 bg-spotify-dark/50 rounded-lg">
+          <div className="text-spotify-green font-bold text-lg">{totalCount}</div>
+          <div className="text-spotify-lightGray text-xs">Total Artists</div>
+        </div>
+        <div className="text-center p-3 bg-spotify-dark/50 rounded-lg">
+          <div className="text-spotify-green font-bold text-lg">{topGenres[0]?.[0] || 'N/A'}</div>
+          <div className="text-spotify-lightGray text-xs">Top Genre</div>
+        </div>
       </div>
       
       {/* Insights */}
       <div className="mt-6 p-4 bg-spotify-dark/50 rounded-lg">
         <h4 className="text-white font-medium mb-2">Genre Insights</h4>
         <div className="text-sm text-spotify-lightGray space-y-1">
-          <p>• Larger spheres represent more popular genres in your taste</p>
-          <p>• Connected genres show musical relationships</p>
-          <p>• Your music universe spans {Object.keys(genresData).length} different genres</p>
+          <p>• Your music spans {Object.keys(genresData).length} different genres</p>
+          <p>• {topGenres[0]?.[0]} is your most listened genre</p>
+          <p>• You have diverse musical taste across multiple styles</p>
         </div>
       </div>
     </motion.div>
