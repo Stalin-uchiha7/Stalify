@@ -170,28 +170,29 @@ const Dashboard = () => {
           {/* Navigation Tabs */}
           <nav className="bg-spotify-gray border-b border-gray-800">
             <div className="max-w-6xl mx-auto px-4">
-                  <div className="flex space-x-1 sm:space-x-8 overflow-x-auto">
-                    {[
-                      { id: 'overview', label: 'Overview', icon: BarChart3 },
-                      { id: 'tracks', label: 'Top Tracks', icon: Music },
-                      { id: 'artists', label: 'Top Artists', icon: User },
-                      { id: 'genres', label: 'Genres', icon: TrendingUp },
-                      { id: 'patterns', label: 'Patterns', icon: Clock },
-                      { id: 'personality', label: 'Personality', icon: Brain },
-                      { id: 'features', label: 'Audio Features', icon: Activity },
-                      { id: 'profile', label: 'Profile', icon: Settings },
-                    ].map((tab) => (
+              <div className="flex space-x-0 sm:space-x-8 overflow-x-auto scrollbar-hide">
+                {[
+                  { id: 'overview', label: 'Overview', shortLabel: 'Overview', icon: BarChart3 },
+                  { id: 'tracks', label: 'Top Tracks', shortLabel: 'Tracks', icon: Music },
+                  { id: 'artists', label: 'Top Artists', shortLabel: 'Artists', icon: User },
+                  { id: 'genres', label: 'Genres', shortLabel: 'Genres', icon: TrendingUp },
+                  { id: 'patterns', label: 'Patterns', shortLabel: 'Patterns', icon: Clock },
+                  { id: 'personality', label: 'Personality', shortLabel: 'Personality', icon: Brain },
+                  { id: 'features', label: 'Audio Features', shortLabel: 'Features', icon: Activity },
+                  { id: 'profile', label: 'Profile', shortLabel: 'Profile', icon: Settings },
+                ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-1 sm:px-2 border-b transition-colors whitespace-nowrap ${
+                    className={`flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-2 sm:px-3 border-b transition-colors whitespace-nowrap flex-shrink-0 ${
                       activeTab === tab.id
-                        ? 'border-spotify-green text-white border-b-2 sm:border-b-2'
+                        ? 'border-spotify-green text-white border-b-2'
                         : 'border-transparent text-spotify-lightGray hover:text-white'
                     }`}
                   >
-                    <tab.icon className="w-4 h-4" />
-                    <span className="text-sm sm:text-base">{tab.label}</span>
+                    <tab.icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-xs sm:text-base hidden sm:inline">{tab.label}</span>
+                    <span className="text-xs sm:hidden">{tab.shortLabel}</span>
                   </button>
                 ))}
               </div>
