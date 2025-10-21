@@ -4,8 +4,8 @@ import { Music, Headphones } from 'lucide-react';
 
 const Login = () => {
   const handleSpotifyLogin = () => {
-    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID || 'your_client_id';
-    const redirectUri = encodeURIComponent('https://stalify.netlify.app/callback');
+    const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID || 'd12ec6e0891842689812d902f2176614';
+    const redirectUri = encodeURIComponent(`${window.location.origin}/callback`);
     const scopes = [
       'user-read-private',
       'user-read-email',
