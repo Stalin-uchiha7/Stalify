@@ -68,7 +68,7 @@ app.get('/api/env-test', (req, res) => {
 app.get('/api/debug-oauth', (req, res) => {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
-  const scopes = ['user-read-private', 'user-read-email', 'user-top-read', 'user-read-recently-played'].join(' ');
+  const scopes = ['user-read-private', 'user-read-email', 'user-top-read', 'user-read-recently-played', 'user-modify-playback-state', 'user-read-playback-state', 'streaming'].join(' ');
   
   const authUrl = `https://accounts.spotify.com/authorize?` +
     `client_id=${clientId}&` +
