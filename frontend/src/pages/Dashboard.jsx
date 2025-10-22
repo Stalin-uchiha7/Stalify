@@ -9,7 +9,6 @@ import StatsSummary from '../components/StatsSummary';
 import ListeningPatterns from '../components/ListeningPatterns';
 import MusicPersonality from '../components/MusicPersonality';
 import AudioFeatures from '../components/AudioFeatures';
-import MusicConstellation from '../components/MusicConstellation';
 import HeatMap from '../components/HeatMap';
 import SoundWaveVisualization from '../components/SoundWaveVisualization';
 import GenreVisualization3D from '../components/GenreVisualization3D';
@@ -329,13 +328,6 @@ const Dashboard = () => {
                           <GenreVisualization3D genres={stats?.genreDistribution} />
                         </div>
                         
-                        {/* Music Constellation */}
-                        <div className="mb-8">
-                          <MusicConstellation 
-                            artists={stats?.topArtists?.mediumTerm?.items} 
-                            tracks={stats?.topTracks?.mediumTerm?.items} 
-                          />
-                        </div>
                         
                         {/* Heat Map */}
                         <div className="mb-8">
